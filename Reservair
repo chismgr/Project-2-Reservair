@@ -1,0 +1,496 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+
+using namespace std;
+
+struct user {
+	int id = 0, finalid = 0;
+	string firstname, lastname, username, password;
+};
+
+bool loginver(user login[], int i) {
+	int j = 0, k = 0;
+	string userin, passin;
+	int timesrun = 0;
+	bool validlogin = false;
+	while (j < i) {
+		if (timesrun == 0) {//used only so that the welcoming message and login isnt shown multiple times for no reason
+			timesrun++;
+			cout << "------------------------------------------------" << endl;
+			cout << "WELCOME TO RESERVAIR SYSTEM" << endl;
+			cout << "------------------------------------------------" << endl;
+			cout << "Please enter your username : ";
+			cin >> userin;
+			cout << "Please enter your password : ";
+			cin >> passin;//validation not useful because it is a string
+			cout << "------------------------------------------------" << endl;
+		}
+		while (k < i) {//this loop is used exclusively for determining if the username and password is correct
+			if (userin == login[k].username && passin == login[k].password) {
+				validlogin = true;
+				login[0].finalid = k;
+			}
+				k++;
+		}
+		if (validlogin == true){//if the username and password are correct, this will break the main loop body
+			break;
+		}
+		if (validlogin == false){//if the username or password is incorrect, this will reset the main loop entirely after displaying the error message
+			cout << "Your username or password was incorrect, please try again" << endl;
+			timesrun = 0;
+			j = -1; //this is set as negative one so that if the username or password is incorrect, the "j++" later on will not mess up the main body loop
+			k = 0;
+		}
+		j++;
+	}
+	return validlogin;
+}
+
+struct seating {
+	string row, window1, center1, aisle1, aisle2, center2, window2;//I kept this in to show that I attempted to use a struct for seating, but decided that it would
+																//be far easier to just pass the array between functions as needed
+};
+bool displaySeats(string seatchart[10][7]) {
+	system("cls");
+	int i = 0, j = 0;
+	cout << "Row" << "\t" << "Window" << "\t" << "Center" << "\t" << "Aisle" << "\t" << "Aisle" << "\t" << "Center" << "\t" << "Window" << endl;
+	while (i < 10) {
+		cout << seatchart[i][0]<< "\t" << seatchart[i][1] << "\t"
+			<< seatchart[i][2] << "\t" << seatchart[i][3] << "\t" << seatchart[i][4] << "\t" << seatchart[i][5] << "\t" << seatchart[i][6] << endl;//I believed that this was more simple overall than using an inner loop
+		i++;
+	}
+	return true;
+}
+bool reserve(string seatchart[10][7]) {
+	system("cls");
+	char column;
+	int row = 0, columnnum = 0, i = 0, j = 0;
+	bool valid = false;
+	while (valid == false) {
+	valid = true;
+		cout << "What row is your desired seat in? (1-10)" << endl;
+		cin >> row;
+		while (1)
+		{
+			if (cin.fail())//validation
+			{
+				cin.clear();
+				cin.ignore();
+				cout << "Your selection was invalid. Please try again." << endl;
+				cin >> row;
+			}
+			if (!cin.fail())
+				break;
+		}
+		cout << "What column is your desired seat in?(A-F)" << endl;
+		cin >> column;
+		while (1)
+		{
+			if (cin.fail())//validation
+			{
+				cin.clear();
+				cin.ignore();
+				cout << "Your selection was invalid. Please try again." << endl;
+				cin >> column;
+			}
+			if (!cin.fail())
+				break;
+		}
+		row = row - 1;//done for simplicity in array location
+if (column == 'a' || column == 'A') {//i'm sure there is an easier way to do this, but this seems to work perfectly
+			columnnum = 1;
+		}
+		else if (column == 'b' || column == 'B') {
+			columnnum = 2;
+		}
+		else if (column == 'c' || column == 'C') {
+			columnnum = 3;
+		}
+		else if (column == 'd' || column == 'D') {
+			columnnum = 4;
+		}
+		else if (column == 'e' || column == 'E') {
+			columnnum = 5;
+		}
+		else if (column == 'f' || column == 'F') {
+			columnnum = 6;
+		}
+		else {
+			valid = false;
+			cout << "Your column entry was invalid. Please try again." << endl;
+		}
+		if (row < 0 || row > 9) {
+			valid = false;
+			cout << "Your row entry was invalid. Please try again." << endl;
+		}
+		if (valid == true) {
+			break;
+		}
+	}
+	seatchart[row][columnnum] = "X";//sets user selected location as 'X' in future calls
+	return true;
+}
+bool cancel(string seatchart[10][7]) {
+	char column;
+	int row = 0, columnnum = 0, i = 0, j = 0;
+	bool valid = true;
+	while (valid == true) {
+		system("cls");
+		valid = true;
+cout << "What is the row of the seat you would like to cancel? (1-10)" << endl;//This whole section is more or less identical to reservation, except for some minor changes
+		cin >> row;
+		while (1)//validation
+		{
+			if (cin.fail())
+			{
+				cin.clear();
+				cin.ignore();
+				cout << "Your selection was invalid. Please try again." << endl;
+				cin >> row;
+			}
+			if (!cin.fail())
+				break;
+	}
+		cout << "What is the column of the seat you would like to cancel?(A-F)" << endl;
+		cin >> column;
+		while (1)
+		{
+			if (cin.fail())
+			{
+				cin.clear();
+				cin.ignore();
+				cout << "Your selection was invalid. Please try again." << endl;
+				cin >> column;
+			}
+			if (!cin.fail())
+				break;
+		}
+		row = row - 1;//done for simplicity in array location
+		if (column == 'a' || column == 'A') {//i'm sure there is an easier way to do this, but this seems to work perfectly
+			columnnum = 1;
+		}
+		else if (column == 'b' || column == 'B') {
+			columnnum = 2;
+		}
+		else if (column == 'c' || column == 'C') {
+			columnnum = 3;
+		}
+		else if (column == 'd' || column == 'D') {
+			columnnum = 4;
+		}
+		else if (column == 'e' || column == 'E') {
+			columnnum = 5;
+		}
+		else if (column == 'f' || column == 'F') {
+			columnnum = 6;
+		}
+		else {
+			valid = false;
+			cout << "Your column entry was invalid. Please try again." << endl;
+		}
+		if (row < 0 || row > 9) {
+			valid = false;
+			cout << "Your row entry was invalid. Please try again." << endl;
+		}
+		if (seatchart[row][columnnum] != "X") {
+			cout << "The location you provided is not reserved by anybody. Please check your inputs and try again." << endl;
+			valid = false;
+			break;
+		}
+		if (valid == true) {
+			break;
+		}
+	}
+	seatchart[row][columnnum] = toupper(column);
+	return true;
+}
+bool save(string seatchart[10][7]) {
+	fstream file;
+	int i = 0, j = 0;
+	file.open("chartIn.txt", ios::out);
+	while (i < 10) {
+		while (j < 7) {
+			if (j == 0) {//row 0 would not write to the file. This if statement fixes that issue
+				file << seatchart[i][0] << "\t";
+			}
+			j++;
+			file << seatchart[i][j] << "\t";
+			if (j == 6) {
+				file << endl;
+				j = 0;
+				break;
+			}
+		}
+		i++;
+	}
+	file.close();
+
+	return true;
+}
+bool stats(string seatchart[10][7]) {
+	ofstream file;
+	int i = 0, j = 0, k = 0;
+	float reserved = 0, available = 0, percava = 0, percres = 0, total = 0;
+	while (i < 10) {
+		j = 1;
+		while (j < 7) {
+			if (seatchart[i][j] == "X") {
+				reserved++;
+			}
+			else {
+				available++;
+			}
+			j++;
+		}
+		i++;
+	}
+	total = available + reserved;
+	percava = (available/total)*100;
+	percres = (reserved/total)*100;
+	if (reserved == 0) {
+		percava = 100;
+		percres = 0;
+	}
+	else if (available == 0) {
+		percava = 0;
+		percres = 100;
+	}
+
+	cout << "There are " << available << " seats available. That is " << percava << "% of seats available." << endl;
+cout << "There are " << reserved << " seats reserved. That is " << percres << "% of seats reserved." << endl;//find a way to display the individual locations of the reserved and available
+	i = 0;
+	j = 1;
+	cout << "Here are all available seats." << endl;
+	while (i < 10) {
+		while (j < 7) {
+			if (seatchart[i][j] != "X") {
+				cout << i + 1 << seatchart[i][j] << ", ";
+			}
+			j++;
+		}
+		j = 1;
+		i++;
+	}
+	cout << endl;
+	i = 0;
+	j = 1;
+	cout << "Here are all reserved seats." << endl;
+	while (i < 10) {
+		while (j < 7) {
+if (seatchart[i][j] == "X") {
+				cout << i + 1 << seatchart[i][j] << ", ";
+			}
+			j++;
+		}
+		j = 1;
+		i++;
+	}
+	cout << endl;
+	file.open("statistics.txt", ios::out);
+	file << "Available seats: " << available << endl;
+	file << "Percentage of available seats: " << percava << endl;
+	file << endl;
+	file << "Reserved seats: " << reserved << endl;
+	file << "Precentage of reserved seats: " << percres << endl;
+	file << endl;
+	file << "List of available seats: " << endl;
+	i = 0;
+	j = 1;
+	while (i < 10) {
+		while (j < 7) {
+			if (seatchart[i][j] != "X") {
+				file << i + 1 << seatchart[i][j] << ", ";
+				k++;
+				if (k == 15) {
+					file << endl;
+				}
+			}
+			j++;
+		}
+		j = 1;
+		i++;
+	}
+	file << endl;
+	file << "List of reserved seats: " << endl;
+i = 0;
+	j = 1;
+	while (i < 10) {
+		while (j < 7) {
+			if (seatchart[i][j] == "X") {
+				file << i + 1 << seatchart[i][j] << ", ";
+				k++;
+				if (k == 15) {
+					file << endl;
+				}
+			}
+			j++;
+		}
+		j = 1;
+		i++;
+	}
+	file << endl;
+	file.close();
+	return true;
+}
+bool help() {
+	system("cls");
+	cout << "Option 1: Display seat chart." << endl;//This was the easiest function out of them all
+	cout << "This option will display to you the most updated version of the plane's seating chart." << endl;
+	cout << endl;
+	cout << "Option 2: Reserve seat." << endl;
+	cout << "Using this option, you can reserve a seat. When prompted, enter the row number(numeric 1-10), and the column letter(A-F)." << endl;
+	cout << "NOTE: If the selected seat has already been reserved, you will be prompted again to select a different seat." << endl;
+	cout << endl;
+	cout << "Option 3: Cancel reservation." << endl;
+	cout << "Using this option, you can cancel a seat if it has been reserved. When prompted, enter the row number(numeric 1-10), and the column letter(A-F)." << endl;
+	cout << "NOTE: If the selected seat has not been reserved, you will be prompted again to select a seat to cancel." << endl;
+	cout << endl;
+	cout << "Option 4: Save seat chart to file." << endl;
+	cout << "This option will save the current seating chart to the provided file for future use." << endl;
+	cout << endl;
+cout << "Option 5: Statistics." << endl;
+	cout << "This option will provide you a short list of statistics including the total number of available seats, the number of reserved seats, " <<endl;
+	cout << "the percentage of available and reserved seats, and a list of available seats followed by a list of reserved seats." << endl;
+	cout << endl;
+	cout << "Option 6: Help." << endl;
+	cout << "This option displays the help message ytou are currently seeing." << endl;
+	cout << endl;
+	cout << "Option 7: Quit." << endl;
+	cout << "This option will the program." << endl;
+
+	return true;
+}
+void welcome(int k, string seatchart[10][7]) {
+	system("cls");
+	user login[10];
+	int choice = 0;
+	bool done1 = false, done2 = false, done3 = false, done4 = false, done5= false, done6 = false, done7 = false;
+	while (done7 == false) {
+		cout << "------------------------------------------------------------------ -" << endl;
+		cout << "WELCOME TO RESERVAIR SYSTEM - " << login[k].firstname << login[k].lastname << endl; //I was unable to display the name here. I am not sure why
+		cout << "------------------------------------------------------------------ -" << endl;
+		cout << "1. Display Seat Chart" << endl;
+		cout << "2. Reserve Seat" << endl;
+		cout << "3. Cancel Reservation" << endl;
+		cout << "4. Save Seat Chart to File" << endl;
+		cout << "5. Statistics" << endl;
+		cout << "6. Help" << endl;
+		cout << "7. Quit" << endl;
+		cout << "------------------------------------------------------------------ -" << endl;
+		cout << "Please Enter Your Choice(1 - 7) : ";
+		cin >> choice;
+		while (1)
+		{
+			if (cin.fail())
+			{
+				cin.clear();
+				cin.ignore();
+				cout << "Your selection was invalid. Please try again." << endl;
+				cin >> choice;
+			}
+			if (!cin.fail())
+				break;
+		}
+		cout << "------------------------------------------------------------------ -" << endl;
+
+		switch (choice) {//provides consise and easy to read choices in the code
+		case 1:
+			done1 = displaySeats(seatchart);
+			cin.ignore();
+			cout << "Press ENTER to continue...";
+			cin.get();
+			system("cls");
+			break;
+		case 2:
+			done2 = reserve(seatchart);
+			cout << "Reservation successful." << endl;
+			cin.ignore();
+			cout << "Press ENTER to continue...";
+			cin.get();
+			system("cls");
+			break;
+		case 3:
+	done3 = cancel(seatchart);
+			cout << "Reservation succesfully cancelled." << endl;
+			cin.ignore();
+			cout << "Press ENTER to continue...";
+			cin.get();
+			system("cls");
+			break;
+
+case 4:
+			done4 = save(seatchart);
+			cout << "File successfully saved." << endl;
+			cin.ignore();
+			cout << "Press ENTER to continue...";
+			cin.get();
+			system("cls");
+			break;
+
+		case 5:
+			done5 = stats(seatchart);
+			cin.ignore();
+			cout << "Press ENTER to continue...";
+			cin.get();
+			system("cls");
+			break;
+
+		case 6:
+			done6 = help();
+			cin.ignore();
+			cout << "Press ENTER to continue...";
+			cin.get();
+			system("cls");
+			break;
+
+		case 7:
+			system("cls");
+			cout << "Thank you for choosing Reservair, have a wonderful day." << endl;
+			done7 = true;
+			break;
+
+		}
+	}
+}
+
+
+
+int main() {
+	fstream file;
+	user login[10];
+	string seatchart[10][7];
+	int i = 0, j = 0, k = 0;
+	string userin, passin;
+
+
+	file.open("systemUser.txt", ios::in);
+
+	while (!file.eof()) {
+file >> login[i].id >> login[i].firstname >> login[i].lastname >> login[i].username >> login[i].password;
+		i++;
+	}
+	file.close();
+	if (loginver(login, i) == true) {
+		cout << "test" << endl;
+		i = 0;
+		file.open("chartIn.txt", ios::in);
+		while (!file.eof()) {//no matter my research, I could not find a successful way to use a function forthis that made use of only skills you taught us
+			file >> seatchart[i][0] >> seatchart[i][1] >> seatchart[i][2] >> seatchart[i][3] >> seatchart[i][4] >> seatchart[i][5] >> seatchart[i][6];
+			i++;
+		}
+		file.close();
+		i = 0;
+		while (i < 10) {//redunant
+			cout << seatchart[i][0] << "\t" << seatchart[i][1] << "\t"
+				<< seatchart[i][2]<< "\t" << seatchart[i][3] << "\t" << seatchart[i][4] << "\t" << seatchart[i][5] << "\t" << seatchart[i][6] << endl;
+			i++;
+		} 
+		k = login[0].finalid;
+		welcome(k, seatchart);
+
+	}
+	else {//I do not believe that there is a possible way to trigger this, but maybe I am wrong. It is only here in case i am wrong
+		cout << "There was a major error. Please restart the program. Have a nice day." << endl;
+	}
+}
